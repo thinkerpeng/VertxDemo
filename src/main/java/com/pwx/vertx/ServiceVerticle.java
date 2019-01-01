@@ -2,7 +2,9 @@ package com.pwx.vertx;
 
 import com.pwx.vertx.resource.DemoResource;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.JksOptions;
@@ -16,6 +18,30 @@ import io.vertx.ext.web.handler.BodyHandler;
  */
 public class ServiceVerticle extends AbstractVerticle
 {
+	private static final int CORE_NUM = 2;
+
+	public static void main(String[] args)
+	{
+		Vertx vertx = Vertx.vertx();
+		DeploymentOptions deploymentOptions = new DeploymentOptions()
+				.setWorker(true)
+				.setInstances(CORE_NUM)
+				.setWorkerPoolSize(CORE_NUM)
+				.setWorkerPoolName("vertx-thread-pool");
+
+		vertx.deployVerticle(ServiceVerticle.class, deploymentOptions, asyncResult ->
+		{
+			if (asyncResult.failed())
+			{
+				System.out.println("Start server failed!");
+			}
+			else
+			{
+				System.out.println("Start server success!");
+			}
+		});
+	}
+
 	@Override
 	public void start(Future<Void> startFuture) throws Exception
 	{
